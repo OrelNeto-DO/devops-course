@@ -16,7 +16,7 @@ print(student["school"])
 student["age"] += 1
 print("updated age", student["age"])
 
-#del student["grade"]
+del student["grade"]
 print("dictionary after removing 'grade' from student", student)
 
 if "grade" in student:
