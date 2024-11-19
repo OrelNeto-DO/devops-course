@@ -30,3 +30,5 @@ with open("journal.txt", "r") as j_file:
         words = line.split()
         total_words += len(words[2:])
 print(f"the number of entries to the log file: {total_entries} and the number of words it holds in entries are: {total_words}")
+
+# לשפצר בהמשך ככה שאחרי אנטרי פורפס לא ממשיך להשלח פלט

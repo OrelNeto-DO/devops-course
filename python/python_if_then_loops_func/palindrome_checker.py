@@ -13,3 +13,4 @@ def a_palindrome(word):
 
 word = input(str("provide word to check if palindrome: "))
 print(a_palindrome(word))
+

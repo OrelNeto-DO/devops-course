@@ -35,4 +35,4 @@ def calculator():
             print("cant divide by zero") #what if i want to provide another one then?
 calculator()
                     
-                    
+#took too long. maybe we will do it again once we get better.
