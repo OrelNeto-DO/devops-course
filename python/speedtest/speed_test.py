@@ -21,3 +21,6 @@ def log_speed():
 while True:
     log_speed()
     time.sleep(300)
+#does the process run for ever? how do i shut if off ?
+"""its not in a virtual machine so its always work in bg a s process
+what to do"""
