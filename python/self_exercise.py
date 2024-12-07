@@ -96,7 +96,10 @@
 #         print(f"{i} X {j} = {i * j}")
 #     print()
 
-while True:
-    user_input = input("provide me with the correct input to stop (you should input 'stop'): ")
-    if user_input.lower() == "stop":
-        break
+# while True:
+#     user_input = input("provide me with the correct input to stop (you should input 'stop'): ")
+#     if user_input.lower() == "stop":
+#         break
+
+
+

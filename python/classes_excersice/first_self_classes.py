@@ -36,4 +36,4 @@ print(studnet4.study("how to cook anything but burgers in his"))
 student5 = Student("emil,", 26, "C")
 print(student5.introduce())
 print(student5.study("CyberSecurity"))
-print(f"{student5.name} is thinking about replacing his career into {student5.study('DevOps').split('is ')[1].split(' ')[1]} engineer")
+print(f"{student5.name} is thinking about replacing his career into {student5.study('DevOps').split('is ')[1].split(' ')[1]} engineer") #the last print statement has done with help by chat gpt. i would like to understand it more throughly.
