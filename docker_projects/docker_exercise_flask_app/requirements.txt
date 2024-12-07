@@ -1,0 +1,4 @@
+Flask==2.0.3
+Werkzeug==2.0.3
+sqlalchemy==1.4.31
+pymysql==1.0.2
