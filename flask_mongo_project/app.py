@@ -1,40 +1,49 @@
-from flask import Flask, request, jsonify
-from flask_pymongo import PyMongo
-from bson import json_util
-import json
+from flask import Flask, render_template
+from sqlalchemy import create_engine, text
 import os
+import random
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-# שימוש בסביבת סביבה עבור כתובת MongoDB
-app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://mongodb:27017/userdb")
-mongo = PyMongo(app)
+# קריאת משתני הסביבה
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST", "mysql")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_NAME = os.getenv("DB_NAME", "mydatabase")
 
-@app.route('/add_user', methods=['POST'])
-def add_user():
-    # בדיקה שהבקשה היא JSON
-    if not request.is_json:
-        return jsonify({"error": "Request must be JSON"}), 400
-    
-    data = request.get_json()
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    
-    if not first_name or not last_name:
-        return jsonify({"error": "First name and last name are required"}), 400
-    
-    user_data = {
-        "first_name": first_name,
-        "last_name": last_name
-    }
-    
-    mongo.db.users.insert_one(user_data)
-    return jsonify({"message": "User added successfully", "user": user_data}), 201
+# כתובת חיבור ל-MySQL
+DB_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+engine = create_engine(DB_URL)
 
-@app.route('/get_users', methods=['GET'])
-def get_users():
-    users = list(mongo.db.users.find())
-    return json.loads(json_util.dumps(users))
+@app.route("/")
+def index():
+    try:
+        with engine.connect() as connection:
+            # שליפת כל התמונות מהמסד
+            result = connection.execute(text("SELECT id, image_url, counter FROM images"))
+            images = [{"id": row["id"], "url": row["image_url"], "counter": row["counter"]} for row in result]
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+            # בחירת תמונה אקראית
+            selected_image = random.choice(images)
+            selected_image_id = selected_image["id"]
+            selected_image_url = selected_image["url"]
+            selected_image_counter = selected_image["counter"]
+
+            # עדכון הקאונטר במסד הנתונים
+            connection.execute(
+                text("UPDATE images SET counter = counter + 1 WHERE id = :id"),
+                {"id": selected_image_id}
+            )
+
+        # שליחת ה-URL והקאונטר לתבנית
+        return render_template("index.html", url=selected_image_url, counter=selected_image_counter)
+    except Exception as e:
+        print(f"Error: {e}")
+        return "Error connecting to the database."
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
