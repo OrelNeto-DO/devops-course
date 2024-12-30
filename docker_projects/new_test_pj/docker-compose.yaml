@@ -6,8 +6,8 @@ services:
       - "5005:5000"
     environment:
       - FLASK_ENV=development
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=${JENKINS_DB_USER}
+      - DB_PASSWORD=${JENKINS_DB_PASSWORD}
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=mydatabase
@@ -17,8 +17,8 @@ services:
   mysql:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${JENKINS_DB_PASSWORD}
+      MYSQL_DATABASE: mydatabase
     ports:
       - "3306:3306"
     volumes:
@@ -27,4 +27,3 @@ services:
 
 volumes:
   sqldata:
-
