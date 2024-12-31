@@ -1,8 +1,0 @@
-def remove_all(list, value):
-    while value in list:
-        numbers.remove(value)
-
-numbers = [1, 2, 2, 3, 4, 2]
-print(numbers)
-remove_all(numbers, 2)
-print(numbers)
