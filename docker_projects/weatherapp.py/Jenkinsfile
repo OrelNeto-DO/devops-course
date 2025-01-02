@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = 'orelneto/simple_weather_app'
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_TAG = "${BUILD_NUMBER}"
+        DOCKER_TAG_LATEST = "latest"
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo 'Cleaning up old images, containers, and Jenkins workspace'
+                    sh 'docker system prune -af'  // מנקה את המיכלים והדימויים הישנים
+                    cleanWs()  // מנקה את תיקיית העבודה של Jenkins
+                }
+            }
+        }
+
+        stage('Copy from GitHub') {
+            steps {
+                git branch: 'main', url: 'https://github.com/OrelNeto-DO/devops-course.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo 'Building Docker image'
+                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                }
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                script {
+                    echo 'Testing the application with cURL'
+                    def response = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:5000', returnStdout: true).trim()
+                    if (response != '200') {
+                        error "Application is not running correctly. HTTP status: ${response}"
+                    }
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    echo 'Pushing Docker image to DockerHub'
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG_LATEST}").push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to AWS') {
+            steps {
+                script {
+                    echo 'Deploying to AWS'
+                    // נניח שאתה משתמש ב-AWS CLI כדי לפרוס את הדימוי ל-EC2
+                    sh '''
+                    aws ec2 run-instances --image-id <ami-id> --count 1 --instance-type t2.micro --key-name <your-key-name> --security-group-ids <your-security-group-id> --subnet-id <your-subnet-id> --user-data file://deploy.sh
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Cleaning up'
+            sh 'docker system prune -af'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
+        }
+    }
+}
