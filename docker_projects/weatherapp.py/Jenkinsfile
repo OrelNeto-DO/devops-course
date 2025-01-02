@@ -26,8 +26,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker image'
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    echo 'Building Docker image manually'
+                    // בניית דימוי דוקר באמצעות פקודת DOCKER BUILD ידנית
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                 }
             }
         }
@@ -49,8 +50,8 @@ pipeline {
                 script {
                     echo 'Pushing Docker image to DockerHub'
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG_LATEST}").push()
+                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG_LATEST}"
                     }
                 }
             }
