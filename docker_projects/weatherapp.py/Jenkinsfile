@@ -55,18 +55,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Deploy to AWS') {
-            steps {
-                script {
-                    echo 'Deploying to AWS'
-                    // נניח שאתה משתמש ב-AWS CLI כדי לפרוס את הדימוי ל-EC2
-                    sh '''
-                    aws ec2 run-instances --image-id <ami-id> --count 1 --instance-type t2.micro --key-name <your-key-name> --security-group-ids <your-security-group-id> --subnet-id <your-subnet-id> --user-data file://deploy.sh
-                    '''
-                }
-            }
-        }
     }
     post {
         always {
